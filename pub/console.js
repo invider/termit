@@ -7,66 +7,34 @@ var con = (function(window) {
 'use strict'
 
 const BLINK = 300
-const TARGET = 'ws://' + window.location.host + window.location.pathname + 'channel'
 
-let focused= true
+let focused = true
 let PROMPT = '&gt; '
+let CURSOR = 0x258A
 //let OUT = '&lt; '
 let OUT = ''
-let ws
 let con
 let buffer = ""
 let command = ""
 let queue = []
 let blinking = false
 let lastUpdate = Date.now()
+let handler = null
 
-/*
 function expand() {
     var c = document.getElementById('console')
-    //var newWidth = window.innerWidth
-    //var newHeight = window.innerHeight
-    //c.style.width = newWidth
-    //c.style.height = newHeight
+    /*
+    var newWidth = window.innerWidth
+    var newHeight = window.innerHeight
+    c.style.width = newWidth
+    c.style.height = newHeight
+    */
 }
-this.addEventListener('resize', expand, false)
-*/
-
-function openSocket(target) {
-    let ws = new WebSocket(target)
-
-    ws.onopen = function() {};
-
-    ws.onmessage = function (e) {
-        var msg = e.data;
-        if (msg.length > 0) {
-            println(OUT + msg.toString())
-            prompt()
-        } else {
-            prompt()
-        }
-    };
-
-    ws.onerror = function(e) {
-        console.dir(e)
-        console.log('[error] ')
-        unfocus()
-    }
-
-    ws.onclose = function(e) { 
-        console.dir(e)
-        console.log('[closed]')
-        unfocus()
-    };
-
-    return ws
-}
+window.addEventListener('resize', expand, false)
 
 window.onload = function load() {
     con = document.getElementById('console')
-    console.log('Accessing console @' + TARGET)
-    ws = openSocket(TARGET)
-    //expand()
+    expand()
     prompt()
 }
 
@@ -81,7 +49,7 @@ setInterval(function() {
 function cur() {
     blinking = false
     if (focused) {
-        con.innerHTML += String.fromCharCode(0x258A)
+        con.innerHTML += String.fromCharCode(CURSOR)
     }
 }
 
@@ -141,7 +109,8 @@ function print(msg) {
 }
 
 function println(msg) {
-    print(msg + '\n')
+    //print(msg + '\n')
+    print(msg + '<br>\n')
 }
 
 function cemit(c) {
@@ -149,27 +118,15 @@ function cemit(c) {
     emit(c)
 }
 
-function sendQueue() {
-    if (ws.readyState === WebSocket.OPEN) {
-        for (let i = 0; i < queue.length; i++) {
-            ws.send(queue[i])
-        }
-        queue.length = 0
-    } else if (ws.readyState === WebSocket.CONNECTING) {
-        // not ready - queue and reschedule
-        if (sendQueue.length < 3) setTimeout(sendQueue, 1000)
-    } else if (ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED) {
-        ws = openSocket(TARGET)
-        if (sendQueue.length < 3) setTimeout(sendQueue, 1000)
-    }
-}
-
 function cmd() {
     if (command.length > 0) {
         queue.push(command)
         command = ""
     }
-    sendQueue()
+    println('')
+    if (handler) {
+        handler.exec()
+    }
 }
 
 function ignoreEvent(e) {
@@ -214,18 +171,34 @@ window.addEventListener('keydown', function(e) {
         }
 
         lastUpdate = Date.now()
-        e.preventDefault()
-        e.stopPropagation()
+        //e.preventDefault()
+        //e.stopPropagation()
         return false
     }
 
     return true
 })
 
+function setHandler(h) {
+    if (!h) throw 'handler is expected!'
+    handler = h
+    handler.console = api
+    if (handler.init) handler.init()
+}
 
-return {
+const api = {
     unfocus: unfocus,
     focus: focus,
+    setHandler: setHandler,
+    getQueue: function() {
+        return queue
+    },
+
+    print: print,
+    println: println,
+    prompt: prompt,
 }
+
+return api
 
 })(this)

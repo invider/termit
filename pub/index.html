@@ -2,8 +2,16 @@
     <head>
         <title>Termit</title>
         <script src="console.js"></script>
+        <script src="dumpHandler.js"></script>
+        <script src="socketHandler.js"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                con.setHandler( window.dumpHandler )
+            })
+        </script>
     </head>
     <body>
-        <div id="con"></div>
+        <div id="console"></div>
     </body>
 </html>
