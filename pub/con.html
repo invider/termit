@@ -1,0 +1,206 @@
+<html>
+<head>
+    
+<style>
+@font-face {
+    font-family: 'moon';
+    src: url('moon.ttf');
+}
+* {
+    margin: 0;
+    padding: 0;
+}
+html, body {
+    background-color: #100020;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+#console {
+    width: 90%;
+    height: 90%;
+    border: 0px;
+    position: absolute;
+    overflow: scroll;
+    overflow-x: hidden;
+    display: block;
+    font-family: 'rabbit';
+    font-size: 24pt;
+    color: #50E010;
+    white-space: pre-wrap;
+    word-break: break-all;
+    word-wrap: break-word;
+}
+@keyframes blink {
+    50% {
+        opacity: 0.0;
+    }
+}
+@-webkit-keyframes blink {
+    50% {
+        opacity: 0.0;
+    }
+}
+.blink {
+    animation: blink 1s step-start 0s infinite;
+    -webkit-animation: blink 1s step-start 0s infinite;
+}
+</style>
+
+<script>
+var PROMPT = ''
+var ws
+var con
+var buffer = ""
+var command = ""
+var blinking = false
+var lastUpdate = Date.now()
+
+function expand() {
+    var c = document.getElementById('con')
+    var newWidth = window.innerWidth
+    var newHeight = window.innerHeight
+    c.style.width = newWidth
+    c.style.height = newHeight
+}
+this.addEventListener('resize', expand, false)
+
+this.onload = function load() {
+    con = document.getElementById('con')
+    ws = new WebSocket("ws://localhost:8888/echo")
+
+    ws.onopen = function() {
+    };
+
+    ws.onmessage = function (e) {
+        var msg = e.data;
+        println(msg.toString())
+    };
+
+    ws.onclose = function() { 
+        console.log('[closed]')
+    };
+
+    expand()
+    prompt()
+}
+
+// cursor blink updater
+setInterval(function() {
+    if (blinking) return
+    if ((Date.now() - lastUpdate) > 300) {
+        con.innerHTML = buffer
+        bcur()
+    }
+}, 100)
+
+function cur() {
+    blinking = false
+    con.innerHTML += String.fromCharCode(0x258A)
+}
+
+function bcur() {
+    blinking = true
+    con.innerHTML += '<span class="blink">'
+        + String.fromCharCode(0x258A) + '</span>'
+}
+
+function prompt() {
+    if (PROMPT) print(PROMPT)
+}
+
+// synchronize buffer with console div
+function sync() {
+    con.innerHTML = buffer
+    cur()
+}
+
+// remove last symbol
+function pop() {
+    if (buffer.length < 1) return
+    buffer = buffer.slice(0, -1)
+}
+
+function cpop() {
+    if (command.length < 1) return
+    command = command.slice(0, -1)
+}
+
+function backspace() {
+    pop(); sync();
+}
+
+function scroll() {
+    if (con.scrollTop + con.clientHeight + 12 < con.scrollHeight) {
+        con.scrollTop = con.scrollHeight;
+    }
+}
+
+function emit(c) {
+    buffer += c
+    sync()
+    scroll()
+}
+
+function print(msg) {
+    buffer += msg
+    sync()
+    scroll()
+}
+
+function println(msg) {
+    print(msg + '\n')
+}
+
+function cemit(c) {
+    command += c
+    emit(c)
+}
+
+function cmd() {
+    ws.send(command)
+    command = ""
+    prompt()
+}
+
+function ignoreEvent(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    return false
+}
+
+this.oncontextmenu = ignoreEvent
+
+this.onkeyup = ignoreEvent
+
+this.onkeypress = function(e) {
+    var ch
+    var code = e.which || e.keyCode
+        
+    if (code === 13) {
+        emit('\n')
+        cmd()
+    } else if (code === 8) {
+        cpop()
+        backspace()
+    } else {
+        if (e.key) {
+            ch = e.key
+        } else if (e.charCode) {
+            ch = String.fromCharCode(e.charCode)
+        }
+        cemit(ch)
+    }
+
+    lastUpdate = Date.now()
+    e.preventDefault()
+    e.stopPropagation()
+    return false
+}
+</script>
+
+</head>
+<body>
+<div id="con">
+</div>
+</body>
