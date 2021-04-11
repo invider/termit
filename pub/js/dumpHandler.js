@@ -12,7 +12,7 @@ var dumpHandler = {
         for (let i = 0; i < queue.length; i++) {
             const cmd = queue[i]
             console.log('[' + cmd + ']')
-            con.println('< ' + cmd)
+            con.println('' + cmd)
         }
         queue.length = 0
         this.console.prompt()

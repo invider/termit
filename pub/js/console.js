@@ -23,12 +23,10 @@ let handler = null
 
 function expand() {
     var c = document.getElementById('console')
-    /*
     var newWidth = window.innerWidth
     var newHeight = window.innerHeight
     c.style.width = newWidth
     c.style.height = newHeight
-    */
 }
 window.addEventListener('resize', expand, false)
 
@@ -110,7 +108,7 @@ function print(msg) {
 
 function println(msg) {
     //print(msg + '\n')
-    print(msg + '<br>\n')
+    print(msg + '\n')
 }
 
 function cemit(c) {
@@ -123,7 +121,6 @@ function cmd() {
         queue.push(command)
         command = ""
     }
-    println('')
     if (handler) {
         handler.exec()
     }
@@ -187,6 +184,7 @@ function setHandler(h) {
 }
 
 const api = {
+    expand: expand,
     unfocus: unfocus,
     focus: focus,
     setHandler: setHandler,

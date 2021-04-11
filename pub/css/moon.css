@@ -1,10 +1,10 @@
-<html>
-<head>
-    
-<style>
 @font-face {
-    font-family: 'moon';
-    src: url('moon.ttf');
+    font-family: 'visitor';
+    src: url('../fnt/visitor2.ttf');
+}
+@font-face {
+    font-family: 'operator';
+    src: url('../fnt/pixel-operator-mono.ttf');
 }
 * {
     margin: 0;
@@ -24,13 +24,18 @@ html, body {
     overflow: scroll;
     overflow-x: hidden;
     display: block;
-    font-family: 'moon';
-    font-size: 24pt;
+    font-family: 'operator';
+    font-size: 20pt;
     color: #50E010;
     white-space: pre-wrap;
     word-break: break-all;
     word-wrap: break-word;
+
 }
+#console::-webkit-scrollbar-track {
+  background: #800000;
+}
+
 @keyframes blink {
     50% {
         opacity: 0.0;
@@ -45,21 +50,3 @@ html, body {
     animation: blink 1s step-start 0s infinite;
     -webkit-animation: blink 1s step-start 0s infinite;
 }
-</style>
-
-    <link rel="stylesheet" href="css/moon.css">
-    <script src="console.js"></script>
-    <script src="dumpHandler.js"></script>
-    <script src="socketHandler.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            con.setHandler( window.dumpHandler )
-        })
-    </script>
-
-</head>
-
-<body>
-    <div id="console"></div>
-</body>
-</html>

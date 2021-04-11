@@ -1,12 +1,15 @@
 <html>
     <head>
         <title>Termit</title>
-        <script src="console.js"></script>
-        <script src="dumpHandler.js"></script>
-        <script src="socketHandler.js"></script>
+
+        <link rel="stylesheet" href="css/moon.css">
+        <script src="js/console.js"></script>
+        <script src="js/dumpHandler.js"></script>
+        <script src="js/socketHandler.js"></script>
 
         <script>
             document.addEventListener('DOMContentLoaded', (event) => {
+                con.expand()
                 con.setHandler( window.dumpHandler )
             })
         </script>
