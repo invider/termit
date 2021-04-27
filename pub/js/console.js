@@ -7,6 +7,8 @@ var con = (function(window) {
 'use strict'
 
 const BLINK = 300
+const DEFAULT_THEME = 'dark'
+const THEME_STORAGE = 'termit-theme'
 
 let focused = true
 let PROMPT = '&gt; '
@@ -21,6 +23,23 @@ let blinking = false
 let lastUpdate = Date.now()
 let handler = null
 
+const themes = [
+    'default',
+    'solar',
+    'eclipse',
+    'dark',
+]
+
+function setTheme(theme) {
+    if (!theme || themes.indexOf(theme) < 0) {
+        theme = DEFAULT_THEME
+    }
+
+    console.log('setting theme: ' + theme)
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem(THEME_STORAGE, theme)
+}
+
 function expand() {
     var c = document.getElementById('console')
     var newWidth = window.innerWidth
@@ -30,11 +49,14 @@ function expand() {
 }
 window.addEventListener('resize', expand, false)
 
-window.onload = function load() {
+window.addEventListener('load', () => {
     con = document.getElementById('console')
     expand()
     prompt()
-}
+
+    //const theme = localStorage.getItem(THEME_STORAGE)
+    setTheme(DEFAULT_THEME)
+})
 
 // cursor blink updater
 setInterval(function() {
