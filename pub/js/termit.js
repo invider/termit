@@ -23,18 +23,32 @@ let blinking = false
 let lastUpdate = Date.now()
 let handler = null
 
-const env = {
-    cursor: 0x258A,
-    out: '',
-    //out: '&lt ',
-}
-
 const themes = [
     'default',
     'solar',
     'eclipse',
     'dark',
 ]
+
+const env = {
+    id:     'termit',
+    cursor: 0x258A,
+    out:    '',
+    //out:  '&lt ',
+}
+
+const actions = {
+    adjust: function() {
+        var c = document.getElementById(env.id)
+        if (!c) {
+            throw `The element id="${env.id}" MUST be present in the document!`
+        }
+        var newWidth = window.innerWidth
+        var newHeight = window.innerHeight
+        c.style.width = newWidth
+        c.style.height = newHeight
+    },
+}
 
 function setTheme(theme) {
     if (!theme || themes.indexOf(theme) < 0) {
@@ -46,18 +60,14 @@ function setTheme(theme) {
     localStorage.setItem(THEME_STORAGE, theme)
 }
 
-function expand() {
-    var c = document.getElementById('termit')
-    var newWidth = window.innerWidth
-    var newHeight = window.innerHeight
-    c.style.width = newWidth
-    c.style.height = newHeight
+function adjust() {
+    actions.adjust()
 }
-window.addEventListener('resize', expand, false)
+window.addEventListener('resize', adjust, false)
 
 window.addEventListener('load', () => {
     term = document.getElementById('termit')
-    expand()
+    adjust()
     prompt()
 
     //const theme = localStorage.getItem(THEME_STORAGE)
@@ -215,7 +225,6 @@ function setHandler(h) {
 }
 
 const api = {
-    expand: expand,
     unfocus: unfocus,
     focus: focus,
     setHandler: setHandler,
