@@ -2,7 +2,7 @@
  * Web Terminal Emulator
  * License: MIT
  */
-var con = (function(window) {
+var term = (function(window) {
 
 'use strict'
 
@@ -12,16 +12,22 @@ const THEME_STORAGE = 'termit-theme'
 
 let focused = true
 let PROMPT = '&gt; '
-let CURSOR = 0x258A
+//let CURSOR = 0x258A
 //let OUT = '&lt; '
-let OUT = ''
-let con
+//let OUT = ''
+let term
 let buffer = ""
 let command = ""
 let queue = []
 let blinking = false
 let lastUpdate = Date.now()
 let handler = null
+
+const env = {
+    cursor: 0x258A,
+    out: '',
+    //out: '&lt ',
+}
 
 const themes = [
     'default',
@@ -41,7 +47,7 @@ function setTheme(theme) {
 }
 
 function expand() {
-    var c = document.getElementById('console')
+    var c = document.getElementById('termit')
     var newWidth = window.innerWidth
     var newHeight = window.innerHeight
     c.style.width = newWidth
@@ -50,7 +56,7 @@ function expand() {
 window.addEventListener('resize', expand, false)
 
 window.addEventListener('load', () => {
-    con = document.getElementById('console')
+    term = document.getElementById('termit')
     expand()
     prompt()
 
@@ -69,17 +75,17 @@ setInterval(function() {
 function cur() {
     blinking = false
     if (focused) {
-        con.innerHTML += String.fromCharCode(CURSOR)
+        term.innerHTML += String.fromCharCode(env.cursor)
     }
 }
 
 function bcur(buf) {
     blinking = true
     if (focused) {
-        con.innerHTML = buf + '<span class="blink">'
+        term.innerHTML = buf + '<span class="blink">'
             + String.fromCharCode(0x258A) + '</span>'
     } else {
-        con.innerHTML = buf
+        term.innerHTML = buf
     }
 }
 
@@ -89,7 +95,7 @@ function prompt() {
 
 // synchronize buffer with console div
 function sync() {
-    con.innerHTML = buffer
+    term.innerHTML = buffer
     cur()
 }
 
@@ -111,8 +117,8 @@ function backspace() {
 }
 
 function scroll() {
-    if (con.scrollTop + con.clientHeight + 12 < con.scrollHeight) {
-        con.scrollTop = con.scrollHeight;
+    if (term.scrollTop + term.clientHeight + 12 < term.scrollHeight) {
+        term.scrollTop = term.scrollHeight;
     }
 }
 
@@ -129,8 +135,11 @@ function print(msg) {
 }
 
 function println(msg) {
-    //print(msg + '\n')
     print(msg + '\n')
+}
+
+function printout(msg) {
+    print(env.out + msg + '\n')
 }
 
 function cemit(c) {
@@ -201,7 +210,7 @@ window.addEventListener('keydown', function(e) {
 function setHandler(h) {
     if (!h) throw 'handler is expected!'
     handler = h
-    handler.console = api
+    handler.term = api
     if (handler.init) handler.init()
 }
 
@@ -216,6 +225,7 @@ const api = {
 
     print: print,
     println: println,
+    printout: printout,
     prompt: prompt,
 }
 

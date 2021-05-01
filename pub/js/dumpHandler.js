@@ -6,15 +6,15 @@ var dumpHandler = {
     },
 
     exec: function() {
-        const con = this.console
-        const queue = con.getQueue()
+        const term = this.term
+        const queue = term.getQueue()
 
         for (let i = 0; i < queue.length; i++) {
             const cmd = queue[i]
             console.log('[' + cmd + ']')
-            con.println('' + cmd)
+            term.printout('' + cmd)
         }
         queue.length = 0
-        this.console.prompt()
+        term.prompt()
     },
 }

@@ -1,4 +1,6 @@
 :root {
+    --primary-font:     "operator";
+    --primary-font-size: 22px;
     --primary-color:    #222222;
     --background-color: #fafac8;
     --track-color:      #aaaa88;

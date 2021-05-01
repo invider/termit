@@ -3,19 +3,19 @@
         <title>Termit</title>
 
         <link rel="stylesheet" href="css/theme.css">
-        <link rel="stylesheet" href="css/moon.css">
-        <script src="js/console.js"></script>
+        <link rel="stylesheet" href="css/style.css">
+        <script src="js/termit.js"></script>
         <script src="js/dumpHandler.js"></script>
         <script src="js/socketHandler.js"></script>
 
         <script>
             document.addEventListener('DOMContentLoaded', (event) => {
-                con.expand()
-                con.setHandler( window.dumpHandler )
+                //term.expand()
+                term.setHandler( window.dumpHandler )
             })
         </script>
     </head>
     <body>
-        <div id="console"></div>
+        <div id="termit" class="termit"></div>
     </body>
 </html>
