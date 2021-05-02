@@ -32,7 +32,8 @@ const themes = [
 
 const env = {
     id:     'termit',
-    cursor: 0x258A,
+    //cursor: '_',
+    cursor: String.fromCharCode(0x258A),
     out:    '',
     //out:  '&lt ',
 }
@@ -48,6 +49,12 @@ const actions = {
         c.style.width = newWidth
         c.style.height = newHeight
     },
+
+    ctrl: {
+        KeyZ: function() {
+            // next theme
+        }
+    }
 }
 
 function setTheme(theme) {
@@ -85,7 +92,7 @@ setInterval(function() {
 function cur() {
     blinking = false
     if (focused) {
-        term.innerHTML += String.fromCharCode(env.cursor)
+        term.innerHTML += env.cursor
     }
 }
 
@@ -93,7 +100,11 @@ function bcur(buf) {
     blinking = true
     if (focused) {
         term.innerHTML = buf + '<span class="blink">'
+            + env.cursor + '</span>'
+        /*
+        term.innerHTML = buf + '<span class="blink">'
             + String.fromCharCode(0x258A) + '</span>'
+            */
     } else {
         term.innerHTML = buf
     }
@@ -193,12 +204,15 @@ window.addEventListener('keydown', function(e) {
             unfocus()
         } else if (e.keyCode === 13) {
             if (e.ctrlKey) {
+                // multi-line input
                 cemit('\n')
             } else {
                 emit('\n')
                 cmd()
             }
         } else if (e.ctrlKey) {
+            const fn = actions.ctrl[e.code]
+            if (fn) fn()
             return
         } else if (e.keyCode === 8) {
             backspace()
@@ -228,6 +242,9 @@ const api = {
     unfocus: unfocus,
     focus: focus,
     setHandler: setHandler,
+    setCursor: function(cur) {
+        env.cursor = cur
+    },
     getQueue: function() {
         return queue
     },
