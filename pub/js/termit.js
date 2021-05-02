@@ -52,7 +52,7 @@ const actions = {
 
     ctrl: {
         KeyZ: function() {
-            // next theme
+            nextTheme()
         }
     }
 }
@@ -63,8 +63,18 @@ function setTheme(theme) {
     }
 
     console.log('setting theme: ' + theme)
+    env.theme = theme
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem(THEME_STORAGE, theme)
+}
+
+function nextTheme() {
+    const theme = env.theme || DEFAULT_THEME
+    let i = themes.indexOf(theme) + 1
+    if (i >= themes.length) i = 0
+
+    const nextTheme = themes[i] || DEFAULT_THEME
+    setTheme(nextTheme)
 }
 
 function adjust() {
@@ -77,8 +87,8 @@ window.addEventListener('load', () => {
     adjust()
     prompt()
 
-    //const theme = localStorage.getItem(THEME_STORAGE)
-    setTheme(DEFAULT_THEME)
+    const theme = localStorage.getItem(THEME_STORAGE)
+    setTheme(theme)
 })
 
 // cursor blink updater
