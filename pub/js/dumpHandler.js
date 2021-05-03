@@ -5,16 +5,9 @@ var dumpHandler = {
         console.log('initializing dump handler')
     },
 
-    exec: function() {
+    exec: function(cmd) {
         const term = this.term
-        const queue = term.getQueue()
-
-        for (let i = 0; i < queue.length; i++) {
-            const cmd = queue[i]
-            console.log('[' + cmd + ']')
-            term.printout('' + cmd)
-        }
-        queue.length = 0
-        term.prompt()
+        console.log('[' + cmd + ']')
+        term.printout('' + cmd)
     },
 }

@@ -184,7 +184,11 @@ function cmd() {
         command = ""
     }
     if (handler) {
-        handler.exec()
+        for (let i = 0; i < queue.length; i++) {
+            handler.exec('' + queue[i])
+        }
+        queue.length = 0
+        prompt()
     }
 }
 
